@@ -15,7 +15,7 @@ router.post('/data', (req, res) => {
     // Process the received data as needed
     // For example, you could store it in a database
     // or perform other actions based on the data
-    console.log('Received sensor data:', sensorData);
+    alert('Received sensor data:', sensorData);
 
     // Send a response back to acknowledge the data receipt
     res.send('Data received successfully');
