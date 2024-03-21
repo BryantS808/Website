@@ -1,0 +1,24 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 5% 3%;
+}
+.infoSegment {
+    margin-top: 20px; /* Example margin top */
+    padding: 10px; /* Example padding */
+    background-color: #f0f0f0; /* Example background color */
+    border: 1px solid #ccc; /* Example border */
+    border-radius: 5px; /* Example border radius */
+}
+
+.bullet4column{
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+}
+.bullet4column ul{
+    list-style-type: disc; /* Add bullet points */
+}
+.bullet4column li{
+    display: inline-block; /* Ensure list items stay inline */
+    width: 100% /* Calculate width for each column */
+}

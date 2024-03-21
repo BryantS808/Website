@@ -1,10 +1,11 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 
 // Define routes related to the plant sensor functionality
 router.get('/', (req, res) => {
   // Handle the request for the plant sensor page
-  res.send('This is plantsensor page');
+  res.sendFile(path.join(__dirname, '../views/arduinosensor.html'));
 });
 
 let dataArray = [];

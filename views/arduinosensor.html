@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Sensor (DEAD)</title>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css?v=2'>
+
+</head>
+<body>
+    <header>
+        <h1>Plant Sensor (DEAD)</h1>
+    </header>
+    <h2>The Arduino Plant Sensor</h2>
+    <nav>
+        <a href="/">Home</a>
+    </nav>
+    <main>
+        <section>
+            <h2>Summary</h2>
+            <p>This project was to make a arduino plant sensor that reads a plants soil moisture level overtime.
+                The project did work and was actually pretty simple, the Arduino code will be attached.
+                The arduino implementation itself only took about a month inlcuding shipping. 
+                However the main goal was to integrate it with my website to display, which is what fell through.
+                Maybe that can change in the future, right now integration with Vercel seems hard if not impossible.
+                For now I am keeping the Node structure, the router and views in case I come back to this.
+                While this website integration may be dead, below is info about setting up the sensor.
+            </p>
+        </section>
+        <section class="infoSegment">
+        <h2>Project</h2>
+            <h3>Code</h3>
+            <section class="code">
+              <pre>
+                <code class="language-cpp">
+                  #include &lt;WiFiS3.h&gt;
+                  #include &lt;ArduinoJson.h&gt;
+          
+                  void printWifiStatus();
+                  void sendData(const char* server, int port, const String jsonStr);
+                  String makeDataJSON(int moisture);
+                  // BASE CODE FOR SOIL MOISTURE SENSOR FROM DFROBOT DOCUMENTATION
+                  // A LOT OF CODE FOR CONENCTING TO WEBSITE BASED BY dlf, and TOM IGOE
+          
+                  // Wifi Stuff
+                  #include "info.h"
+          
+                  char ssid[] = OWN_SSID;
+                  char pass[] = OWN_PASS;  
+                  int status = WL_IDLE_STATUS;
+                  char server[] = ""; // if locally running find machine local ip + /path
+                  int port = 3000; // Change as necessary
+                  WiFiClient client;
+          
+                  const int AirValue = 560;   // you need to change this value that you had recorded in the air
+                  const int WaterValue = 290;  // you need to change this value that you had recorded in the water
+          
+                  int intervals = (AirValue - WaterValue)/3;
+                  int soilMoistureValue = 0;
+                  
+                  void setup() {
+                    Serial.begin(9600); // open serial port, set the baud rate to 9600 bps
+                    // check for the WiFi module:
+                    if (WiFi.status() == WL_NO_MODULE) {
+                      Serial.println("Communication with WiFi module failed!");
+                      // don't continue
+                      while (true);
+                    }
+                    String fv = WiFi.firmwareVersion();
+                    if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
+                      Serial.println("Please upgrade the firmware");
+                    }
+                    // attempt to connect to WiFi network:
+                    while (status != WL_CONNECTED) {
+                      Serial.print("Attempting to connect to SSID: ");
+                      Serial.println(ssid);
+                      // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+                      status = WiFi.begin(ssid, pass);
+                      // wait 10 seconds for connection:
+                      delay(10000);
+                    }
+                    printWifiStatus();
+                  }
+          
+                  void loop() {
+                    int mval = analogRead(A0);  // get moisture level
+                    String jsonStr = makeDataJSON(mval);
+                    sendData(server, port, jsonStr);
+                    // int eval // get electricty consumption
+                    // Serial.println(mval); // print the value to serial port
+                    delay(3600000);
+                  }
+          
+                  String makeDataJSON(int moisture) {
+                    StaticJsonDocument<200> doc;
+                    doc["sensor"] = "moisture sensor";
+                    doc["value"] = moisture;
+                    // Serialize JSON to a string
+                    String jsonStr;
+                    serializeJson(doc, jsonStr);
+                    return jsonStr;
+                  }
+          
+                  void sendData(const char* server, int port, const String jsonStr) {
+                    if (client.connect(server, port)) {
+                      Serial.println("Connected to server");
+                      // Make a POST request
+                      client.println("POST /plantsensor/data HTTP/1.1");
+                      client.println("Host: ");
+                      client.println("Content-Type: application/json");
+                      client.print("Content-Length: ");
+                      client.println(jsonStr.length());
+                      client.println();
+                      client.println(jsonStr);
+                    } else {
+                      Serial.println("Connection failead");
+                    }
+                  }
+          
+                  void printWifiStatus() {
+                    // print the SSID of the network you're attached to:
+                    Serial.print("SSID: ");
+                    Serial.println(WiFi.SSID());
+          
+                    // print your board's IP address:
+                    IPAddress ip = WiFi.localIP();
+                    Serial.print("IP Address: ");
+                    Serial.println(ip);
+          
+                    // print the received signal strength:
+                    long rssi = WiFi.RSSI();
+                    Serial.print("signal strength (RSSI):");
+                    Serial.print(rssi);
+                    Serial.println(" dBm");
+                  }
+                </code>
+              </pre>
+            </section>
+          </section>
+          
+    </main>
+</body>
+</html>
